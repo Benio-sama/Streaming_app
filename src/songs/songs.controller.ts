@@ -17,11 +17,6 @@ export class SongsController {
     return this.songsService.findAll();
   }
 
-  @Post('/playlists')
-  playlistsAll() {
-    return this.songsService.playlists();
-  }
-
   @Get('/popularArtists')
   async popular() {
     return await this.songsService.popular();
@@ -29,7 +24,7 @@ export class SongsController {
 
   @Get('/top')
   top(@Query('count') param: string) {
-    return this.songsService.top(param);
+    return this.songsService.top(+param);
   }
 
   @Get('/free')

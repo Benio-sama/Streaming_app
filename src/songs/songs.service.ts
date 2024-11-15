@@ -14,80 +14,82 @@ export class SongsService {
   }
 
   findAll() {
-    return this.db.song.findMany();
+    try {
+      return this.db.song.findMany();
+    } catch (error) {
+      return 'nincs ilyen zeneszam';
+    }
   }
 
-  findOne(idparam: number) {
+  findOne(id: number) {
+    if (id === undefined || id === null || isNaN(id)) {
+      return 'az id-nek szamnak kell lennie';
+    }
     try {
       return this.db.song.findUnique({
-        where: { id: idparam },
+        where: { id: id },
       });
     } catch (error) {
-      return "nincs ilyen idval rendelkezo song";
+      return "nincs ilyen id-vel rendelkezo zeneszam";
     }
   }
 
   free() {
-    return this.db.song.findMany({
-      where: {
-        price: 0
-      }
-    });
+    try {
+      return this.db.song.findMany({
+        where: {
+          price: 0
+        }
+      });
+    } catch (error) {
+      return 'hiba tortent';
+    }
   }
 
-  top(param: string) {
+  top(mennyi: number) {
     try {
-      let szam = parseInt(param);
-      if (szam == 0 || szam == undefined || Number.isNaN(szam)) {
-        szam = 10;
+      if (mennyi == 0 || mennyi == undefined || isNaN(mennyi)) {
+        mennyi = 10;
       }
       return this.db.song.findMany({
         orderBy: {
           rating: 'desc'
         },
-        take: szam,
+        take: mennyi,
       });
     } catch (error) {
-      return undefined;
+      return 'hiba tortent';
     }
 
   }
 
   async popular() {
-    const res = await this.db.song.groupBy({
-      by: 'artist',
-      _count: {
-        artist: true
-      },
-      orderBy: {
+    try {
+      const res = await this.db.song.groupBy({
+        by: 'artist',
         _count: {
-          artist: 'desc'
-        }
-      }
-    });
-
-    return res.map((group) => ({
-      artist: group.artist,
-      numberOfSongs: group._count.artist
-    }))
-  }
-
-  playlists() {
-    return this.db.song.findMany({
-      include: {
-        playlists: true
-      },
-      where: {
-        playlists: {
-          some: {
-            name: 'ATE'
+          artist: true
+        },
+        orderBy: {
+          _count: {
+            artist: 'desc'
           }
         }
-      }
-    })
+      });
+
+      return res.map((group) => ({
+        artist: group.artist,
+        numberOfSongs: group._count.artist
+      }))
+    } catch (error) {
+      return 'hiba tortent';
+    }
   }
 
   update(id: number, updateSongDto: UpdateSongDto) {
+    if (id === undefined || id === null || isNaN(id)) {
+      return 'az id-nek szamnak kell lennie';
+    }
     try {
       return this.db.song.update({
         data: updateSongDto,
@@ -99,6 +101,9 @@ export class SongsService {
   }
 
   remove(id: number) {
+    if (id === undefined || id === null || isNaN(id)) {
+      return 'az id-nek szamnak kell lennie';
+    }
     try {
       return this.db.song.delete({
         where: { id: id }

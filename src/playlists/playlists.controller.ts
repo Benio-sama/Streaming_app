@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { PlaylistsService } from './playlists.service';
 import { CreatePlaylistDto } from './dto/create-playlist.dto';
 import { UpdatePlaylistDto } from './dto/update-playlist.dto';
@@ -13,8 +13,14 @@ export class PlaylistsController {
   }
 
   @Patch(':listid/:songid')
-  addSongs(@Param('listid') listid: string, @Param('songid') songid: string) {
-    return this.playlistsService.addSongs(+listid, +songid);
+  modify(@Param('listid') listid: string, @Param('songid') songid: string, @Query('action') action: 'add' | 'remove') {
+    if (action === 'add') {
+      return this.playlistsService.addSongs(+listid, +songid);
+    } else if (action === 'remove') {
+      return this.playlistsService.removeSongs(+listid, +songid);
+    } else {
+      return 'nincs (ilyen) action! az action-nek vagy "add"-nak vagy "remove"-nak kell lennie';
+    }
   }
 
   @Get()

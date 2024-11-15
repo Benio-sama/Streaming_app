@@ -13,25 +13,59 @@ export class PlaylistsService {
   }
 
   addSongs(listid: number, songid: number) {
-    return this.db.playlist.update({
-      where: { id: listid },
-      data: {
-        songs: {
-          connect: { id: songid }
+    if (isNaN(listid) || isNaN(songid) || listid === undefined || songid === undefined || listid === null || songid === null) {
+      return 'az id-nek szamnak kell lennie';
+    }
+    try {
+      return this.db.playlist.update({
+        where: { id: listid },
+        data: {
+          songs: {
+            connect: { id: songid }
+          }
+        },
+        include: {
+          songs: true,
         }
-      },
-      include: {
-        songs: true,
-      }
-    })
+      })
+    } catch (error) {
+      return 'hiba: valamelyik id-vel nincs szam es/vagy lista'
+    }
   }
 
+  removeSongs(listid: number, songid: number) {
+    if (isNaN(listid) || isNaN(songid) || listid === undefined || songid === undefined || listid === null || songid === null) {
+      return 'az id-nek szamnak kell lennie';
+    }
+    try {
+      return this.db.playlist.update({
+        where: { id: listid },
+        data: {
+          songs: {
+            disconnect: { id: songid }
+          }
+        },
+        include: {
+          songs: true,
+        }
+      })
+    } catch (error) {
+      return 'hiba: valamelyik id-vel nincs szam es/vagy lista'
+    }
+  }
 
   findAll() {
-    return this.db.playlist.findMany();
+    try {
+      return this.db.playlist.findMany();
+    } catch (error) {
+      return 'nincs lejatszasi lista';
+    }
   }
 
   findOne(id: number) {
+    if (id === undefined || id === null || isNaN(id)) {
+      return 'az id-nek szamnak kell lennie';
+    }
     try {
       return this.db.playlist.findUnique({
         where: { id: id },
@@ -40,17 +74,34 @@ export class PlaylistsService {
         }
       });
     } catch (error) {
-      return undefined;
+      return 'nincs ilyen id-vel rendelkezo lista';
     }
   }
 
-
-
   update(id: number, updatePlaylistDto: UpdatePlaylistDto) {
-    return `This action updates a #${id} playlist`;
+    if (id === undefined || id === null || isNaN(id)) {
+      return 'az id-nek szamnak kell lennie';
+    }
+    try {
+      return this.db.playlist.update({
+        data: updatePlaylistDto,
+        where: { id: id },
+      });
+    } catch (error) {
+      return 'nincs ilyen id-vel rendelkezo lista';
+    }
   }
 
   remove(id: number) {
-    return `This action removes a #${id} playlist`;
+    if (id === undefined || id === null || isNaN(id)) {
+      return 'az id-nek szamnak kell lennie';
+    }
+    try {
+      return this.db.playlist.delete({
+        where: { id: id }
+      });
+    } catch (error) {
+      return 'nincs ilyen id-vel rendelkezo lista';
+    }
   }
 }

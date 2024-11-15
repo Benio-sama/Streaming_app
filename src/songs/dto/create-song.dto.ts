@@ -1,4 +1,4 @@
-import { IsArray, IsDefined, IsInt, IsString } from "class-validator";
+import { IsArray, IsDefined, IsInt, IsString, Max, Min } from "class-validator";
 
 
 export class CreateSongDto {
@@ -20,6 +20,8 @@ export class CreateSongDto {
 
     @IsDefined()
     @IsInt()
+    @Min(1)
+    @Max(5)
     rating: number;
 
 }
